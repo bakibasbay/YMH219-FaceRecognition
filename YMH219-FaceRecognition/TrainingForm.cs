@@ -65,6 +65,11 @@ public partial class TrainingForm : Form
             txtLabel.Focus();
             return;
         }
+        // Var olan etiket farklı büyük/küçük harfle yazıldıysa listedeki ad kullanılır ("baki" → "Baki")
+        var existing = _dataset.GetLabels()
+            .FirstOrDefault(l => string.Equals(l.Name, label, StringComparison.CurrentCultureIgnoreCase));
+        if (existing != null)
+            label = existing.Name;
         txtLabel.Text = label;
 
         if (!_camera.IsRunning)
