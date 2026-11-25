@@ -24,6 +24,7 @@ public partial class MainForm : Form
     private string? _imagePath;         // kamera kapalıyken gösterilen resim
     private bool _imageBusy;
     private bool _imageReanalyze;
+    private int _savedFaceTotal;
 
     public MainForm()
     {
@@ -182,6 +183,12 @@ public partial class MainForm : Form
 
         lblFaceCount.Text = result.Faces.Count.ToString();
         lblFps.Text = fps is double f ? f.ToString("0.0") : "–";
+
+        if (result.SavedFaces > 0)
+        {
+            _savedFaceTotal += result.SavedFaces;
+            SetStatus($"{_savedFaceTotal} yüz kaydedildi: {_dataset.DetectedFacesDirectory}");
+        }
 
         // Son tahmin, karedeki en büyük (kameraya en yakın) yüze göre gösterilir
         if (result.PrimaryFace is { } face)
@@ -379,9 +386,14 @@ public partial class MainForm : Form
         RefreshStillImage();
     }
 
+    // Açıkken algılanan yüzler saniyede en fazla bir kez DetectedFaces/<tarih>/ klasörüne kaydedilir
     private void tglSaveFaces_CheckedChanged(object? sender, EventArgs e)
     {
         _saveFaces = tglSaveFaces.Checked;
+        _savedFaceTotal = 0;
+        SetStatus(_saveFaces
+            ? "Yüz kaydetme açık: algılanan yüzler saniyede bir DetectedFaces klasörüne kaydedilir"
+            : "Yüz kaydetme kapalı");
     }
 
     // Eşik değiştikçe tahminler anında yeni eşikle değerlendirilir
