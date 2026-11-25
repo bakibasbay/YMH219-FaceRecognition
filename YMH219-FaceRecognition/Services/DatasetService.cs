@@ -48,7 +48,9 @@ public sealed class DatasetService
     // Kullanıcının girdiği etiket adını denetler; geçersizse açıklayıcı mesajla hata verir
     public static string ValidateLabel(string? input)
     {
-        string label = (input ?? string.Empty).Trim();
+        // Baştaki/sondaki ve art arda gelen boşluklar tek boşluğa indirilir ("baki  kapalı" → "baki kapalı")
+        string label = string.Join(' ', (input ?? string.Empty)
+            .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
         if (label.Length == 0)
             throw new ArgumentException("Etiket adı boş olamaz.");
         if (label.Length > MaxLabelLength)
