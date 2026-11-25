@@ -200,16 +200,16 @@ namespace FaceRecognition
             this.cardLabels.Controls.Add(this.lblModelState);
             this.cardLabels.Controls.Add(this.lvLabels);
             this.cardLabels.Controls.Add(this.lblLabelsTitle);
-            this.cardLabels.Location = new System.Drawing.Point(16, 214);
+            this.cardLabels.Location = new System.Drawing.Point(16, 228);
             this.cardLabels.Name = "cardLabels";
-            this.cardLabels.Size = new System.Drawing.Size(340, 344);
+            this.cardLabels.Size = new System.Drawing.Size(340, 330);
             this.cardLabels.TabIndex = 1;
             //
             // btnTrain
             //
             this.btnTrain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnTrain.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
-            this.btnTrain.Location = new System.Drawing.Point(172, 290);
+            this.btnTrain.Location = new System.Drawing.Point(172, 276);
             this.btnTrain.Name = "btnTrain";
             this.btnTrain.Size = new System.Drawing.Size(152, 38);
             this.btnTrain.TabIndex = 4;
@@ -221,7 +221,7 @@ namespace FaceRecognition
             //
             this.btnDeleteLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnDeleteLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
-            this.btnDeleteLabel.Location = new System.Drawing.Point(16, 290);
+            this.btnDeleteLabel.Location = new System.Drawing.Point(16, 276);
             this.btnDeleteLabel.Name = "btnDeleteLabel";
             this.btnDeleteLabel.Size = new System.Drawing.Size(148, 38);
             this.btnDeleteLabel.TabIndex = 3;
@@ -234,7 +234,7 @@ namespace FaceRecognition
             this.lblModelState.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lblModelState.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblModelState.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
-            this.lblModelState.Location = new System.Drawing.Point(16, 240);
+            this.lblModelState.Location = new System.Drawing.Point(16, 226);
             this.lblModelState.Name = "lblModelState";
             this.lblModelState.Size = new System.Drawing.Size(308, 42);
             this.lblModelState.TabIndex = 2;
@@ -258,7 +258,7 @@ namespace FaceRecognition
             this.lvLabels.Location = new System.Drawing.Point(16, 40);
             this.lvLabels.MultiSelect = false;
             this.lvLabels.Name = "lvLabels";
-            this.lvLabels.Size = new System.Drawing.Size(308, 192);
+            this.lvLabels.Size = new System.Drawing.Size(308, 178);
             this.lvLabels.TabIndex = 1;
             this.lvLabels.UseCompatibleStateImageBehavior = false;
             this.lvLabels.View = System.Windows.Forms.View.Details;
@@ -267,13 +267,13 @@ namespace FaceRecognition
             // colLabel
             //
             this.colLabel.Text = "Etiket";
-            this.colLabel.Width = 200;
+            this.colLabel.Width = 180;
             //
             // colSamples
             //
             this.colSamples.Text = "Örnek sayısı";
             this.colSamples.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.colSamples.Width = 100;
+            this.colSamples.Width = 104;
             //
             // lblLabelsTitle
             //
@@ -297,13 +297,13 @@ namespace FaceRecognition
             this.cardCollect.Controls.Add(this.lblCollectTitle);
             this.cardCollect.Location = new System.Drawing.Point(16, 0);
             this.cardCollect.Name = "cardCollect";
-            this.cardCollect.Size = new System.Drawing.Size(340, 198);
+            this.cardCollect.Size = new System.Drawing.Size(340, 212);
             this.cardCollect.TabIndex = 0;
             //
             // btnCancelCollect
             //
             this.btnCancelCollect.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
-            this.btnCancelCollect.Location = new System.Drawing.Point(224, 144);
+            this.btnCancelCollect.Location = new System.Drawing.Point(224, 158);
             this.btnCancelCollect.Name = "btnCancelCollect";
             this.btnCancelCollect.Size = new System.Drawing.Size(100, 38);
             this.btnCancelCollect.TabIndex = 5;
@@ -313,7 +313,7 @@ namespace FaceRecognition
             // btnCollect
             //
             this.btnCollect.Font = new System.Drawing.Font("Segoe UI Semibold", 10F);
-            this.btnCollect.Location = new System.Drawing.Point(16, 144);
+            this.btnCollect.Location = new System.Drawing.Point(16, 158);
             this.btnCollect.Name = "btnCollect";
             this.btnCollect.Size = new System.Drawing.Size(200, 38);
             this.btnCollect.TabIndex = 4;
@@ -327,7 +327,7 @@ namespace FaceRecognition
             this.lblCollectHint.ForeColor = System.Drawing.Color.FromArgb(100, 116, 139);
             this.lblCollectHint.Location = new System.Drawing.Point(16, 98);
             this.lblCollectHint.Name = "lblCollectHint";
-            this.lblCollectHint.Size = new System.Drawing.Size(308, 40);
+            this.lblCollectHint.Size = new System.Drawing.Size(308, 54);
             this.lblCollectHint.TabIndex = 3;
             this.lblCollectHint.Text = "Kameraya bakın ve başınızı hafifçe çevirin. Karede yalnızca bir yüz olmalı. Mevcut etikete örnek eklemek için listeden seçin.";
             //
