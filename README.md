@@ -16,11 +16,33 @@ Kameradan veya seçilen bir resimden yüz bölgelerini algılayan, öğrencinin 
 
 ## Kurulum ve Çalıştırma
 
-1. Depoyu klonlayın ve `YMH219-FaceRecognition.sln` dosyasını Visual Studio 2022 ile açın (veya komut satırında `dotnet build` / `dotnet run --project YMH219-FaceRecognition`).
-2. NuGet paketleri derleme sırasında otomatik indirilir. Ek bir OpenCV kurulumu gerekmez.
-3. **Cascade dosyası:** `YMH219-FaceRecognition/Cascades/haarcascade_frontalface_default.xml` depoda bulunur ve derlemede çıktı klasörüne (`bin/.../Cascades/`) kopyalanır. Dosya silinirse uygulama açılışta anlaşılır bir uyarı verir; kamera ve resim işlemleri kapanır.
-4. **Kamera izni:** Windows *Ayarlar > Gizlilik ve güvenlik > Kamera* bölümünde **Kamera erişimi** ve **Masaüstü uygulamalarının kameranıza erişmesine izin verin** açık olmalıdır. İzin kapalıysa, kamera yoksa veya başka bir uygulama (Teams, Zoom vb.) kamerayı kullanıyorsa uygulama bunu mesajla bildirir.
-5. Uygulamayı çalıştırın (F5).
+### Gereksinimler
+- Windows 10 / 11 (64 bit; OpenCV yerel kütüphanesi yalnızca x64 için gelir)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) veya daha yeni bir SDK
+- Visual Studio 2022 (17.8+) veya Visual Studio 2026, **.NET masaüstü geliştirme** iş yüküyle
+- Web kamerası (resimden tanıma için kamera gerekmez)
+- İlk derlemede NuGet paketlerini indirmek için internet bağlantısı
+
+> Proje `RollForward=Major` ayarına sahiptir. Bilgisayarda .NET 8 çalışma zamanı yoksa daha yeni bir .NET masaüstü çalışma zamanında (ör. .NET 10) da çalışır.
+
+### Visual Studio ile
+1. Depoyu klonlayın:
+   ```bash
+   git clone https://github.com/bakibasbay/YMH219-FaceRecognition.git
+   ```
+2. `YMH219-FaceRecognition.sln` dosyasını Visual Studio ile açın.
+3. **Derle > Çözümü Derle** (`Ctrl+Shift+B`), ardından **F5** ile çalıştırın.
+
+### Komut satırı ile
+```bash
+cd YMH219-FaceRecognition
+dotnet run --project YMH219-FaceRecognition
+```
+
+### Notlar
+- **NuGet paketleri** (OpenCvSharp4 ve yerel OpenCV kütüphaneleri) derleme sırasında otomatik indirilir. Ek bir OpenCV kurulumu gerekmez.
+- **Cascade dosyası:** `YMH219-FaceRecognition/Cascades/haarcascade_frontalface_default.xml` depoda bulunur ve derlemede çıktı klasörüne (`bin/.../Cascades/`) kopyalanır. Dosya silinirse uygulama açılışta anlaşılır bir uyarı verir; kamera ve resim işlemleri kapanır.
+- **Kamera izni:** Windows *Ayarlar > Gizlilik ve güvenlik > Kamera* bölümünde **Kamera erişimi** ve **Masaüstü uygulamalarının kameranıza erişmesine izin verin** açık olmalıdır. İzin kapalıysa, kamera yoksa veya başka bir uygulama (Teams, Zoom vb.) kamerayı kullanıyorsa uygulama bunu mesajla bildirir.
 
 ## Kullanım: Veri Topla → Eğit → Tanı
 
