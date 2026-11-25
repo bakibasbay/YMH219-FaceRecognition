@@ -42,8 +42,24 @@ public partial class MainForm : Form
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
+        tbThreshold.Value = (int)FaceRecognizerService.DefaultThreshold;
         LoadDetector();
+        LoadModel();
         UpdateControls();
+    }
+
+    // Daha önce eğitilmiş model varsa yüklenir; yoksa tanıma kapalı kalır
+    private void LoadModel()
+    {
+        try
+        {
+            _recognizer.TryLoad();
+        }
+        catch (ModelException ex)
+        {
+            ShowWarning(ex.Message, "Model");
+        }
+        UpdateModelInfo();
     }
 
     // Cascade dosyası yüklenemezse kamera ve resim işlemleri kapalı kalır
@@ -166,6 +182,56 @@ public partial class MainForm : Form
 
         lblFaceCount.Text = result.Faces.Count.ToString();
         lblFps.Text = fps is double f ? f.ToString("0.0") : "–";
+
+        // Son tahmin, karedeki en büyük (kameraya en yakın) yüze göre gösterilir
+        if (result.PrimaryFace is { } face)
+            ShowPrediction(face);
+        else if (fps == null)
+            ShowPredictionText("Yüz bulunamadı", Theme.Idle, "Güven skoru: –");
+    }
+
+    private void ShowPrediction(RecognitionResult face)
+    {
+        if (!face.IsRecognized)
+        {
+            string text = _recognizer.IsTrained ? "Tanıma kapalı" : "Model eğitilmemiş";
+            ShowPredictionText(text, Theme.Idle, "Güven skoru: –");
+            return;
+        }
+
+        ShowPredictionText(face.Label, ColorOf(face),
+            $"Güven skoru: {face.Confidence:0.0}   (eşik {_recognizer.Threshold:0})");
+    }
+
+    private void ShowPredictionText(string label, Color color, string score)
+    {
+        lblPredictionLabel.Text = label;
+        lblPredictionLabel.ForeColor = color;
+        pnlPredictionAccent.BackColor = color;
+        lblPredictionScore.Text = score;
+    }
+
+    // Sağ paneldeki model kartı ve durum çubuğu
+    private void UpdateModelInfo()
+    {
+        if (!_recognizer.IsTrained)
+        {
+            lblModelStatus.Text = "Model eğitilmemiş.\nEğitim / Veri Ekleme ekranından en az iki etiket için örnek toplayıp modeli eğitin.";
+            lblModelStatus.ForeColor = Theme.Warning;
+            lblModelInfo.Text = "Model: eğitilmemiş";
+            return;
+        }
+
+        var labels = _recognizer.Labels;
+        bool upToDate = _recognizer.MatchesDataset(_dataset.GetLabels());
+        lblModelStatus.Text =
+            $"{labels.Count} etiket · {_recognizer.SampleCount} örnek\n" +
+            string.Join(", ", labels) + "\n" +
+            (upToDate
+                ? $"Eğitim: {_recognizer.TrainedAt:dd.MM.yyyy HH:mm}"
+                : "Veri seti değişti, modeli yeniden eğitin.");
+        lblModelStatus.ForeColor = upToDate ? Theme.Text : Theme.Warning;
+        lblModelInfo.Text = $"Model: {labels.Count} etiket, {_recognizer.SampleCount} örnek";
     }
 
     // Etiket rengi: tanıma yoksa mavi, bilinmiyorsa kırmızı, aksi halde etiketin sırasına göre
@@ -286,9 +352,13 @@ public partial class MainForm : Form
     {
     }
 
+    #region Tanıma ayarları
+
     private void tglRecognition_CheckedChanged(object? sender, EventArgs e)
     {
         _recognitionEnabled = tglRecognition.Checked;
+        tglRecognition.Text = tglRecognition.Checked ? "Tanıma açık" : "Tanıma kapalı";
+        RefreshStillImage();
     }
 
     private void tglSaveFaces_CheckedChanged(object? sender, EventArgs e)
@@ -296,9 +366,15 @@ public partial class MainForm : Form
         _saveFaces = tglSaveFaces.Checked;
     }
 
+    // Eşik değiştikçe tahminler anında yeni eşikle değerlendirilir
     private void tbThreshold_ValueChanged(object? sender, EventArgs e)
     {
+        _recognizer.Threshold = tbThreshold.Value;
+        lblThreshold.Text = $"\"Bilinmiyor\" eşiği: {tbThreshold.Value}";
+        RefreshStillImage();
     }
+
+    #endregion
 
     #region Yardımcılar
 
@@ -312,6 +388,10 @@ public partial class MainForm : Form
         btnStopCamera.Enabled = running;
         btnOpenImage.Enabled = ready && !_cameraStarting;
         btnTraining.Enabled = ready && !_cameraStarting;
+
+        // Model yokken tanıma ayarları kullanılamaz
+        tglRecognition.Enabled = _recognizer.IsTrained;
+        tbThreshold.Enabled = _recognizer.IsTrained;
         lblSource.Text = running ? "Kaynak: Kamera"
             : _imagePath != null ? "Kaynak: " + Path.GetFileName(_imagePath)
             : string.Empty;
