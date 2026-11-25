@@ -11,7 +11,8 @@ public sealed class ModelException(string message) : Exception(message);
 // LBPH yüz tanıyıcı: eğitme, model.yml olarak kaydetme/yükleme ve tahmin
 public sealed class FaceRecognizerService : IDisposable
 {
-    public const double DefaultThreshold = 70;
+    // Gerçek veriyle yapılan ayırma testinde doğru tahminlerin uzaklığı 36–68 arasında kaldı
+    public const double DefaultThreshold = 80;
 
     // Etiket adları model.yml'de Türkçe karakterleri bozulduğu için ayrı UTF-8 dosyada tutulur
     private sealed record ModelInfo(string[] Labels, int[] SampleCounts, DateTime TrainedAt);

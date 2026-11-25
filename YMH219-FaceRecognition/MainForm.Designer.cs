@@ -318,7 +318,7 @@ namespace FaceRecognition
             this.tbThreshold.Size = new System.Drawing.Size(276, 45);
             this.tbThreshold.TabIndex = 4;
             this.tbThreshold.TickFrequency = 10;
-            this.tbThreshold.Value = 70;
+            this.tbThreshold.Value = 80;
             this.tbThreshold.ValueChanged += new System.EventHandler(this.tbThreshold_ValueChanged);
             //
             // lblThreshold
@@ -329,7 +329,7 @@ namespace FaceRecognition
             this.lblThreshold.Name = "lblThreshold";
             this.lblThreshold.Size = new System.Drawing.Size(268, 20);
             this.lblThreshold.TabIndex = 3;
-            this.lblThreshold.Text = "\"Bilinmiyor\" eşiği: 70";
+            this.lblThreshold.Text = "\"Bilinmiyor\" eşiği: 80";
             //
             // tglSaveFaces
             //
