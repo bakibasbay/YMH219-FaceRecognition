@@ -348,8 +348,26 @@ public partial class MainForm : Form
 
     #endregion
 
+    // Eğitim ekranı açıkken kameranın karelerini o ekran işler
     private void btnTraining_Click(object? sender, EventArgs e)
     {
+        if (_analyzer == null)
+            return;
+
+        _camera.FrameReady -= Camera_FrameReady;
+        try
+        {
+            using var form = new TrainingForm(_camera, _analyzer, _dataset, _recognizer);
+            form.ShowDialog(this);
+        }
+        finally
+        {
+            _camera.FrameReady += Camera_FrameReady;
+            Volatile.Write(ref _framePending, 0);
+            UpdateModelInfo();
+            UpdateControls();
+            RefreshStillImage();
+        }
     }
 
     #region Tanıma ayarları
