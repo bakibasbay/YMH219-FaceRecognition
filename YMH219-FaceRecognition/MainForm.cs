@@ -21,6 +21,10 @@ public partial class MainForm : Form
     private volatile bool _saveFaces;
     private bool _cameraStarting;
 
+    private string? _imagePath;         // kamera kapalıyken gösterilen resim
+    private bool _imageBusy;
+    private bool _imageReanalyze;
+
     public MainForm()
     {
         InitializeComponent();
@@ -63,6 +67,7 @@ public partial class MainForm : Form
     private async void btnStartCamera_Click(object? sender, EventArgs e)
     {
         _cameraStarting = true;
+        _imagePath = null;
         UpdateControls();
         videoView.SetFrame(null);
         videoView.PlaceholderText = "Kamera açılıyor…";
@@ -96,14 +101,16 @@ public partial class MainForm : Form
     {
         this.TryBeginInvoke(() =>
         {
-            if (!running)
+            // Kamera, resim açmak için kapatıldıysa resim ekranda kalır
+            if (!running && _imagePath == null)
             {
                 videoView.SetFrame(null);
                 videoView.PlaceholderText = CameraOffText;
-                lblFps.Text = "–";
                 lblFaceCount.Text = "0";
                 SetStatus("Kamera durduruldu");
             }
+            if (!running)
+                lblFps.Text = "–";
             UpdateControls();
         });
     }
@@ -184,9 +191,96 @@ public partial class MainForm : Form
 
     #endregion
 
-    private void btnOpenImage_Click(object? sender, EventArgs e)
+    #region Görüntü seçme
+
+    private async void btnOpenImage_Click(object? sender, EventArgs e)
     {
+        using var dialog = new OpenFileDialog
+        {
+            Title = "Görüntü Seç",
+            Filter = "Resim dosyaları|*.jpg;*.jpeg;*.png;*.bmp;*.webp;*.tif;*.tiff|Tüm dosyalar|*.*"
+        };
+        if (dialog.ShowDialog(this) != DialogResult.OK)
+            return;
+
+        // Resim gösterilirken kamera kapatılır
+        if (_camera.IsRunning)
+            await _camera.StopAsync();
+
+        _imagePath = dialog.FileName;
+        await AnalyzeImageAsync(allowSave: true);
     }
+
+    // Seçili resmi arka planda işler; ayar değişince aynı resim yeniden işlenir
+    private async Task AnalyzeImageAsync(bool allowSave)
+    {
+        var analyzer = _analyzer;
+        string? path = _imagePath;
+        if (analyzer == null || path == null)
+            return;
+
+        // Önceki işlem sürüyorsa bittiğinde bir kez daha çalıştırılır
+        if (_imageBusy)
+        {
+            _imageReanalyze = true;
+            return;
+        }
+
+        _imageBusy = true;
+        try
+        {
+            do
+            {
+                _imageReanalyze = false;
+                bool recognize = _recognitionEnabled;
+                bool save = allowSave && _saveFaces;
+                allowSave = false;
+
+                var result = await Task.Run(() => analyzer.AnalyzeFile(path, recognize, save));
+                if (_camera.IsRunning || _imagePath != path)
+                {
+                    result.Dispose(); // bu sırada kamera açıldıysa sonuç gösterilmez
+                    return;
+                }
+
+                ShowResult(result, null);
+                SetStatus($"{Path.GetFileName(path)}: {result.Faces.Count} yüz algılandı");
+            } while (_imageReanalyze);
+        }
+        catch (InvalidImageException ex)
+        {
+            ClearImage();
+            SetStatus("Resim açılamadı", true);
+            ShowWarning(ex.Message, "Geçersiz resim");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            ClearImage();
+            SetStatus("Resim okunamadı", true);
+            ShowWarning("Dosya okunamadı:\n\n" + ex.Message, "Görüntü Seç");
+        }
+        finally
+        {
+            _imageBusy = false;
+            UpdateControls();
+        }
+    }
+
+    private void ClearImage()
+    {
+        _imagePath = null;
+        videoView.SetFrame(null);
+        lblFaceCount.Text = "0";
+    }
+
+    // Kamera kapalı ve ekranda resim varsa ayar değişikliğinden sonra resmi yeniden işler
+    private void RefreshStillImage()
+    {
+        if (!_camera.IsRunning && _imagePath != null)
+            _ = AnalyzeImageAsync(allowSave: false);
+    }
+
+    #endregion
 
     private void btnTraining_Click(object? sender, EventArgs e)
     {
@@ -218,7 +312,9 @@ public partial class MainForm : Form
         btnStopCamera.Enabled = running;
         btnOpenImage.Enabled = ready && !_cameraStarting;
         btnTraining.Enabled = ready && !_cameraStarting;
-        lblSource.Text = running ? "Kaynak: Kamera" : string.Empty;
+        lblSource.Text = running ? "Kaynak: Kamera"
+            : _imagePath != null ? "Kaynak: " + Path.GetFileName(_imagePath)
+            : string.Empty;
     }
 
     private void SetStatus(string text, bool error = false)
